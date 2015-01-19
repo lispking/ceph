@@ -553,7 +553,7 @@ int CrushWrapper::insert_item(CephContext *cct, int item, float weight, string n
     if (!name_exists(q->second)) {
       ldout(cct, 5) << "insert_item creating bucket " << q->second << dendl;
       int empty = 0, newid;
-      int r = add_bucket(0, get_default_bucket_type(),
+      int r = add_bucket(0, 0,
 			 CRUSH_HASH_DEFAULT, p->first, 1, &cur, &empty, &newid);
       if (r < 0) {
         ldout(cct, 1) << "add_bucket failure error: " << cpp_strerror(r) << dendl;
@@ -1127,6 +1127,7 @@ void CrushWrapper::encode(bufferlist& bl, bool lean) const
   ::encode(crush->chooseleaf_descend_once, bl);
   ::encode(crush->chooseleaf_vary_r, bl);
   ::encode(crush->straw_calc_version, bl);
+  ::encode(crush->allowed_bucket_algs, bl);
 }
 
 static void decode_32_or_64_string_map(map<int32_t,string>& m, bufferlist::iterator& blp)
@@ -1212,6 +1213,9 @@ void CrushWrapper::decode(bufferlist::iterator& blp)
     }
     if (!blp.end()) {
       ::decode(crush->straw_calc_version, blp);
+    }
+    if (!blp.end()) {
+      ::decode(crush->allowed_bucket_algs, blp);
     }
     finalize();
   }
@@ -1410,6 +1414,7 @@ void CrushWrapper::dump_tunables(Formatter *f) const
   f->dump_int("chooseleaf_descend_once", get_chooseleaf_descend_once());
   f->dump_int("chooseleaf_vary_r", get_chooseleaf_vary_r());
   f->dump_int("straw_calc_version", get_straw_calc_version());
+  f->dump_int("allowed_bucket_algs", get_allowed_bucket_algs());
 
   // be helpful about it
   if (has_firefly_tunables())
