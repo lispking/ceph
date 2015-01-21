@@ -1180,6 +1180,10 @@ void OSDMap::remove_redundant_temporaries(CephContext *cct, const OSDMap& osdmap
       if (raw_up == p->second) {
         ldout(cct, 10) << " removing unnecessary pg_temp " << p->first << " -> " << p->second << dendl;
         pending_inc->new_pg_temp[p->first].clear();
+      } else if (!osdmap.have_pg_pool(p->first.pool())) {
+        ldout(cct, 10) << " removing pg_temp " << p->first
+                       << " for inexistent pool " << p->first.pool() << dendl;
+        pending_inc->new_pg_temp[p->first].clear();
       }
     }
   }
