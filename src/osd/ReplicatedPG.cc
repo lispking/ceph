@@ -8873,7 +8873,7 @@ void ReplicatedBackend::submit_push_data(
   if (first) {
     t->remove(coll, target_oid);
     t->touch(coll, target_oid);
-    t->truncate(coll, recovery_info.soid, recovery_info.size);
+    t->truncate(coll, target_oid, recovery_info.size);
     t->omap_setheader(coll, target_oid, omap_header);
   }
   uint64_t off = 0;
